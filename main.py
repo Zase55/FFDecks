@@ -1,7 +1,9 @@
-from flask import Flask, render_template # type: ignore
+from flask import Flask, render_template, request # type: ignore
 from markupsafe import escape # type: ignore
+from carta.entidad import Carta
 
 app = Flask(__name__)
+cartas = []
 
 # Definir un menú con enlaces y nombres
 menu_items = [
@@ -70,6 +72,16 @@ def submit_tournament():
 @app.route('/formats')
 def formats():
     return render_template('menu.html', menu=menu_items, title="Formatos")
+
+@app.route('/cartas', methods=['POST'])
+def add_card():
+    data = request.get_json()
+    cartas.append(data)
+    return cartas
+
+@app.route('/cartas', methods=['GET'])
+def cards():
+    return cartas
 
 if __name__ == '__main__':
     app.run(debug=True)
