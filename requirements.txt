@@ -1,1 +1,7 @@
 flask==3.0.3
+SQLAlchemy
+Pydantic
+Flask-SQLAlchemy
+Flask-JWT-Extended
+Flask-Pydantic
+pydantic[email]
