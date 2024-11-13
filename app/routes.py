@@ -4,7 +4,7 @@ from app.models import User
 from app.services import create_user
 from pydantic import ValidationError
 from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
 
 cards = []
 
@@ -12,6 +12,17 @@ api = Blueprint('api', __name__)
 
 # Definir un menú con enlaces y nombres
 menu_items = [
+    {'name': 'Login', 'url': '/'},
+    {'name': 'Inicio', 'url': '/'},
+    {'name': 'Buscador', 'url': '/card_finder'},
+    {'name': 'Decks', 'url': '/decks'},
+    {'name': 'Editor', 'url': '/deck_editor'},
+    {'name': 'Torneos', 'url': '/tournaments'},
+    {'name': 'Crear Torneo', 'url': '/submit_tournament'},
+    {'name': 'Formatos', 'url': '/formats'}
+]
+
+menu_items_login = [
     {'name': 'Inicio', 'url': '/'},
     {
         'name': 'Perfil', 'url': '#',
@@ -31,8 +42,11 @@ menu_items = [
 ]
 
 @api.route('/')
+@jwt_required(optional=True)
 def home():
-    return render_template('menu.html', menu=menu_items, title="Inicio")
+    current_user = get_jwt_identity()
+    menu = menu_items_login if current_user else menu_items
+    return render_template('menu.html', menu=menu, title="Inicio")
 
 @api.route('/profile')
 def profile():
