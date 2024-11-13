@@ -10,23 +10,29 @@ cards = []
 api = Blueprint('api', __name__)
 api_profile = Blueprint('profile', __name__)
 profile_my_decks = Blueprint('my_decks', __name__)
+profile_my_tournaments = Blueprint('my_tournaments', __name__)
+profile_card_binder = Blueprint('card_binder', __name__)
+profile_favs = Blueprint('favs', __name__)
 api_card_finder = Blueprint('card_finder', __name__)
 api_decks = Blueprint('decks', __name__)
 api_deck_editor = Blueprint('deck_editor', __name__)
 api_tournaments = Blueprint('tournaments', __name__)
 api_submit_tournament = Blueprint('submit_tournament', __name__)
 api_formats = Blueprint('formats', __name__)
+api_login = Blueprint('login', __name__)
+api_register = Blueprint('register', __name__)
 
 # Definir un menú con enlaces y nombres
 menu_items = [
-    {'name': 'Login', 'url': '/api/login'},
     {'name': 'Inicio', 'url': '/api'},
     {'name': 'Buscador', 'url': '/api/card_finder'},
     {'name': 'Decks', 'url': '/api/decks'},
     {'name': 'Editor', 'url': '/api/deck_editor'},
     {'name': 'Torneos', 'url': '/api/tournaments'},
     {'name': 'Crear Torneo', 'url': '/api/submit_tournament'},
-    {'name': 'Formatos', 'url': '/api/formats'}
+    {'name': 'Formatos', 'url': '/api/formats'},
+    {'name': 'Login', 'url': '/api/login'},
+    {'name': 'Registrarse', 'url': '/api/register'}
 ]
 
 menu_items_login = [
@@ -59,19 +65,19 @@ def home():
 def profile():
     return render_template('menu.html', menu=menu_items, title="Perfil")
 
-@api.route('/profile/my_decks')
+@profile_my_decks.route('/')
 def my_decks():
     return render_template('menu.html', menu=menu_items, title="Decks")
 
-@api.route('/profile/my_tournaments')
+@profile_my_tournaments.route('/')
 def my_tournaments():
     return render_template('menu.html', menu=menu_items, title="Torneos")
 
-@api.route('/profile/card_binder')
+@profile_card_binder.route('/')
 def card_binder():
     return render_template('menu.html', menu=menu_items, title="Mis Cartas")
 
-@api.route('/profile/favs')
+@profile_favs.route('/')
 def favs():
     return render_template('menu.html', menu=menu_items, title="Favoritos")
 
@@ -109,7 +115,7 @@ def add_card():
 def cards():
     return cards
 
-@api.route('/register', methods=['GET','POST'])
+@api_register.route('/rgister', methods=['GET','POST'])
 def register():
     data = request.get_json()
     try:
@@ -124,7 +130,7 @@ def register():
     return jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
     
 
-@api.route('/login', methods=['POST'])
+@api_login.route('/', methods=['POST'])
 def login():
     try:
         user_login = UserLoginSchema(**request.get_json())
@@ -144,7 +150,8 @@ def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-
-#@lm.user_loader
+'''
+@lm.user_loader
 def load_user(user_id):
     return User.get(user_id)
+'''
