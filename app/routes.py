@@ -8,36 +8,44 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 cards = []
 
 api = Blueprint('api', __name__)
+api_profile = Blueprint('profile', __name__)
+profile_my_decks = Blueprint('my_decks', __name__)
+api_card_finder = Blueprint('card_finder', __name__)
+api_decks = Blueprint('decks', __name__)
+api_deck_editor = Blueprint('deck_editor', __name__)
+api_tournaments = Blueprint('tournaments', __name__)
+api_submit_tournament = Blueprint('submit_tournament', __name__)
+api_formats = Blueprint('formats', __name__)
 
 # Definir un menú con enlaces y nombres
 menu_items = [
-    {'name': 'Login', 'url': '/'},
-    {'name': 'Inicio', 'url': '/'},
-    {'name': 'Buscador', 'url': '/card_finder'},
-    {'name': 'Decks', 'url': '/decks'},
-    {'name': 'Editor', 'url': '/deck_editor'},
-    {'name': 'Torneos', 'url': '/tournaments'},
-    {'name': 'Crear Torneo', 'url': '/submit_tournament'},
-    {'name': 'Formatos', 'url': '/formats'}
+    {'name': 'Login', 'url': '/api/login'},
+    {'name': 'Inicio', 'url': '/api'},
+    {'name': 'Buscador', 'url': '/api/card_finder'},
+    {'name': 'Decks', 'url': '/api/decks'},
+    {'name': 'Editor', 'url': '/api/deck_editor'},
+    {'name': 'Torneos', 'url': '/api/tournaments'},
+    {'name': 'Crear Torneo', 'url': '/api/submit_tournament'},
+    {'name': 'Formatos', 'url': '/api/formats'}
 ]
 
 menu_items_login = [
-    {'name': 'Inicio', 'url': '/'},
+    {'name': 'Inicio', 'url': '/api'},
     {
         'name': 'Perfil', 'url': '#',
         'submenu': [
-            {'name': 'Decks', 'url': '/profile/my_decks'},
-            {'name': 'Torneos', 'url': '/profile/my_tournaments'},
-            {'name': 'Mis Cartas', 'url': '/profile/card_binder'},
-            {'name': 'Favoritos', 'url': '/profile/favs'}
+            {'name': 'Decks', 'url': '/api/profile/my_decks'},
+            {'name': 'Torneos', 'url': '/api/profile/my_tournaments'},
+            {'name': 'Mis Cartas', 'url': '/api/profile/card_binder'},
+            {'name': 'Favoritos', 'url': '/api/profile/favs'}
         ]
      },
-    {'name': 'Buscador', 'url': '/card_finder'},
-    {'name': 'Decks', 'url': '/decks'},
-    {'name': 'Editor', 'url': '/deck_editor'},
-    {'name': 'Torneos', 'url': '/tournaments'},
-    {'name': 'Crear Torneo', 'url': '/submit_tournament'},
-    {'name': 'Formatos', 'url': '/formats'}
+    {'name': 'Buscador', 'url': '/api/card_finder'},
+    {'name': 'Decks', 'url': '/api/decks'},
+    {'name': 'Editor', 'url': '/api/deck_editor'},
+    {'name': 'Torneos', 'url': '/api/tournaments'},
+    {'name': 'Crear Torneo', 'url': '/api/submit_tournament'},
+    {'name': 'Formatos', 'url': '/api/formats'}
 ]
 
 @api.route('/')
@@ -47,7 +55,7 @@ def home():
     menu = menu_items_login if current_user else menu_items
     return render_template('menu.html', menu=menu, title="Inicio")
 
-@api.route('/profile')
+@api_profile.route('/')
 def profile():
     return render_template('menu.html', menu=menu_items, title="Perfil")
 
@@ -67,27 +75,27 @@ def card_binder():
 def favs():
     return render_template('menu.html', menu=menu_items, title="Favoritos")
 
-@api.route('/card_finder')
+@api_card_finder.route('/')
 def card_finder():
     return render_template('menu.html', menu=menu_items, title="Buscador de Cartas")
 
-@api.route('/decks')
+@api_decks.route('/')
 def decks():
     return render_template('menu.html', menu=menu_items, title="Decks")
 
-@api.route('/deck_editor')
+@api_deck_editor.route('/')
 def deck_editor():
     return render_template('menu.html', menu=menu_items, title="Editor de Decks")
 
-@api.route('/tournaments')
+@api_tournaments.route('/')
 def tournaments():
     return render_template('menu.html', menu=menu_items, title="Torneos")
 
-@api.route('/submit_tournament')
+@api_submit_tournament.route('/')
 def submit_tournament():
     return render_template('menu.html', menu=menu_items, title="Crear Torneo")
 
-@api.route('/formats')
+@api_formats.route('/')
 def formats():
     return render_template('menu.html', menu=menu_items, title="Formatos")
 
@@ -101,15 +109,20 @@ def add_card():
 def cards():
     return cards
 
-@api.route('/register', methods=['POST'])
+@api.route('/register', methods=['GET','POST'])
 def register():
     data = request.get_json()
     try:
         user_register = UserRegisterSchema(**data)
+        if request.method == 'GET':
+            return render_template('register.html', title='Registro')
+
     except ValidationError as e:
         return jsonify(e.errors()), 400
+    #if data.validate_on_submit():
     user = create_user(user_register)
     return jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
+    
 
 @api.route('/login', methods=['POST'])
 def login():
@@ -130,3 +143,8 @@ def protected():
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+
+#@lm.user_loader
+def load_user(user_id):
+    return User.get(user_id)
