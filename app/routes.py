@@ -1,10 +1,9 @@
 from flask import render_template, request, Blueprint, jsonify # type: ignore
 from app.schemas import UserRegisterSchema, UserLoginSchema
 from app.models import User
-from app.services import create_user
+from app.services import create_user, check_password
 from pydantic import ValidationError
-from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 cards = []
 
@@ -118,12 +117,9 @@ def login():
         user_login = UserLoginSchema(**request.get_json())
     except ValidationError as e:
         return jsonify(e.errors()), 400
-    user: User = User.query.filter_by(username = user_login.username).first()
-    if user and check_password_hash(user.password, user_login.password):
-        access_token = create_access_token(identity=user_login.username)
+    access_token = check_password(user_login)
+    if access_token:
         return jsonify({"message": "Usuario logueado correctamente.", "access_token": access_token}), 200
-
-        #return jsonify({"message": "Usuario logueado correctamente."}), 200
     return jsonify({"message": "Error, la contraseña es errónea."}), 401
 
 # Protect a route with jwt_required, which will kick out requests
