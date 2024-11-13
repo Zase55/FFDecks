@@ -1,7 +1,7 @@
 # created by virtualenv automatically
 __pycache__
 *.pyc
-entorno
+venv
 Tareas.txt
 Notas.txt
 instance
