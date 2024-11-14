@@ -1,9 +1,10 @@
-from flask import render_template, request, Blueprint, jsonify # type: ignore
+from flask import render_template, request, Blueprint, jsonify, redirect, url_for, flash # type: ignore
 from app.schemas import UserRegisterSchema, UserLoginSchema
-from app.models import User
+#from app.models import User
 from app.services import create_user, check_password
 from pydantic import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
+#from app.forms import LoginForm, RegisterForm
 
 cards = []
 
@@ -115,31 +116,39 @@ def add_card():
 def cards():
     return cards
 
-@api_register.route('/rgister', methods=['GET','POST'])
+@api_register.route('/', methods=['GET','POST'])
 def register():
-    data = request.get_json()
-    try:
-        user_register = UserRegisterSchema(**data)
-        if request.method == 'GET':
-            return render_template('register.html', title='Registro')
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            user_register = UserRegisterSchema(**data)
+        except ValidationError as e:
+            jsonify(e.errors()), 400
+            return redirect(url_for('api.register'))
+        
+        user = create_user(user_register)
+        jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
+        return redirect(url_for('api.login'))
+    return render_template('register.html', title="Registro")
 
-    except ValidationError as e:
-        return jsonify(e.errors()), 400
-    #if data.validate_on_submit():
-    user = create_user(user_register)
-    return jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
-    
-
-@api_login.route('/', methods=['POST'])
+@api_login.route('/', methods=['GET', 'POST'])
 def login():
-    try:
-        user_login = UserLoginSchema(**request.get_json())
-    except ValidationError as e:
-        return jsonify(e.errors()), 400
-    access_token = check_password(user_login)
-    if access_token:
-        return jsonify({"message": "Usuario logueado correctamente.", "access_token": access_token}), 200
-    return jsonify({"message": "Error, la contraseña es errónea."}), 401
+    if request.method == 'POST':
+        try:
+            user_login = UserLoginSchema(**request.get_json())
+        except ValidationError as e:
+            #return jsonify(e.errors()), 400
+            flash(e.errors())
+            return redirect(url_for('api.login'))
+        access_token = check_password(user_login)
+        if access_token:
+            #return jsonify({"message": "Usuario logueado correctamente.", "access_token": access_token}), 200
+            flash('Usuario logueado correctamente.')
+            return redirect(url_for('api'))
+        #return jsonify({"message": "Error, la contraseña es errónea."}), 401
+        flash('Error, la contraseña es errónea.')
+        return redirect(url_for('api.login'))
+    return render_template('login.html', title="Login")
 
 # Protect a route with jwt_required, which will kick out requests
 # without a valid JWT present.
