@@ -11,11 +11,11 @@
         <ul>
             {% for item in menu %}
                 <li>
-                    <a href="{{ item.url }}">{{ item.name }}</a>
+                    <a href="{{ item.url }}" type="button">{{ item.name }}</a>
                     {% if item.submenu %}
                         <ul>
                             {% for subitem in item.submenu %}
-                                <li><a href="{{ subitem.url }}">{{ subitem.name }}</a></li>
+                                <li><a href="{{ subitem.url }}" type="button">{{ subitem.name }}</a></li>
                             {% endfor %}
                         </ul>
                     {% endif %}
@@ -24,7 +24,21 @@
         </ul>
     </nav>
 
-    <h1>{{ title }}</h1>
-    <p>Este es el contenido de la página {{ title }}.</p>
+    <div>
+        <h1>{{ title }}</h1>
+        <p>Este es el contenido de la página {{ title }}.</p>
+    </div>
+    <div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+    {% block content %}{% endblock %}
 </body>
 </html>
