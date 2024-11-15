@@ -1,0 +1,20 @@
+line-length = 90
+indent-width = 4
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 60
+quote-style = "double"
+
+[lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
+extend-fixable = ["B"]
+extend-select = ["I"]
+exclude = ["*.pyi", "*tests/*", "*migrations/*"]
+
+[analyze]
+detect-string-imports = true
+
+
+[lint.flake8-quotes]
+docstring-quotes = "double"
