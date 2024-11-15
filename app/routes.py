@@ -1,10 +1,7 @@
-from flask import render_template, request, Blueprint, jsonify, redirect, url_for, flash # type: ignore
-from app.schemas import UserRegisterSchema, UserLoginSchema
-#from app.models import User
-from app.services import create_user, check_password
-from pydantic import ValidationError
+from flask import render_template, request, Blueprint
+from app.routes.constants import menu_items, menu_items_login
 from flask_jwt_extended import jwt_required, get_jwt_identity
-#from app.forms import LoginForm, RegisterForm
+
 
 cards = []
 
@@ -23,42 +20,11 @@ api_formats = Blueprint('formats', __name__)
 api_login = Blueprint('login', __name__)
 api_register = Blueprint('register', __name__)
 
-# Definir un menú con enlaces y nombres
-menu_items = [
-    {'name': 'Inicio', 'url': '/api'},
-    {'name': 'Buscador', 'url': '/api/card_finder'},
-    {'name': 'Decks', 'url': '/api/decks'},
-    {'name': 'Editor', 'url': '/api/deck_editor'},
-    {'name': 'Torneos', 'url': '/api/tournaments'},
-    {'name': 'Crear Torneo', 'url': '/api/submit_tournament'},
-    {'name': 'Formatos', 'url': '/api/formats'},
-    {'name': 'Login', 'url': '/api/login'},
-    {'name': 'Registrarse', 'url': '/api/register'}
-]
-
-menu_items_login = [
-    {'name': 'Inicio', 'url': '/api'},
-    {
-        'name': 'Perfil', 'url': '#',
-        'submenu': [
-            {'name': 'Decks', 'url': '/api/profile/my_decks'},
-            {'name': 'Torneos', 'url': '/api/profile/my_tournaments'},
-            {'name': 'Mis Cartas', 'url': '/api/profile/card_binder'},
-            {'name': 'Favoritos', 'url': '/api/profile/favs'}
-        ]
-     },
-    {'name': 'Buscador', 'url': '/api/card_finder'},
-    {'name': 'Decks', 'url': '/api/decks'},
-    {'name': 'Editor', 'url': '/api/deck_editor'},
-    {'name': 'Torneos', 'url': '/api/tournaments'},
-    {'name': 'Crear Torneo', 'url': '/api/submit_tournament'},
-    {'name': 'Formatos', 'url': '/api/formats'}
-]
-
 @api.route('/')
 @jwt_required(optional=True)
 def home():
     current_user = get_jwt_identity()
+    print(current_user)
     menu = menu_items_login if current_user else menu_items
     return render_template('menu.html', menu=menu, title="Inicio")
 
@@ -115,52 +81,3 @@ def add_card():
 @api.route('/cards', methods=['GET'])
 def cards():
     return cards
-
-@api_register.route('/', methods=['GET','POST'])
-def register():
-    if request.method == 'POST':
-        data = request.get_json()
-        try:
-            user_register = UserRegisterSchema(**data)
-        except ValidationError as e:
-            jsonify(e.errors()), 400
-            return redirect(url_for('api.register'))
-        
-        user = create_user(user_register)
-        jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
-        return redirect(url_for('api.login'))
-    return render_template('register.html', title="Registro")
-
-@api_login.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        try:
-            user_login = UserLoginSchema(**request.get_json())
-        except ValidationError as e:
-            #return jsonify(e.errors()), 400
-            flash(e.errors())
-            return redirect(url_for('api.login'))
-        access_token = check_password(user_login)
-        if access_token:
-            #return jsonify({"message": "Usuario logueado correctamente.", "access_token": access_token}), 200
-            flash('Usuario logueado correctamente.')
-            return redirect(url_for('api'))
-        #return jsonify({"message": "Error, la contraseña es errónea."}), 401
-        flash('Error, la contraseña es errónea.')
-        return redirect(url_for('api.login'))
-    return render_template('login.html', title="Login")
-
-# Protect a route with jwt_required, which will kick out requests
-# without a valid JWT present.
-@api.route("/protected", methods=["GET"])
-@jwt_required()
-def protected():
-    # Access the identity of the current user with get_jwt_identity
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
-
-'''
-@lm.user_loader
-def load_user(user_id):
-    return User.get(user_id)
-'''
