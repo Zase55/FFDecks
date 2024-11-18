@@ -1,5 +1,20 @@
 class Card:
-    def __init__(self,number,rarity,set,name,cost,type,element,exburst,multiplayable,category,job,abilities,power):
+    def __init__(
+        self,
+        number,
+        rarity,
+        set,
+        name,
+        cost,
+        type,
+        element,
+        exburst,
+        multiplayable,
+        category,
+        job,
+        abilities,
+        power,
+    ):
         self.number = number
         self.rarity = rarity
         self.set = set
