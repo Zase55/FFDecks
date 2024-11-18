@@ -1,0 +1,19 @@
+version: "3.4"
+x-restart-policy: &restart-policy
+  restart: unless-stopped
+
+services:
+  database:
+    <<: *restart-policy
+    image: "postgres:12.2"
+    environment:
+      POSTGRES_DB: "root"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "root-database:/var/lib/postgresql/data"
+
+volumes:
+  root-database:
