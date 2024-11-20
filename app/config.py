@@ -1,9 +1,11 @@
 from os import environ
 
+DATABASE_HOST = environ.get("DATABASE_HOST")
+
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = environ.get(
-        "DATABASE_URL", "postgresql+psycopg2://admin:1234@database:5432/root"
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql+psycopg2://admin:1234@{DATABASE_HOST}:5432/root"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "super-secret-key"
