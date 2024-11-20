@@ -4,5 +4,6 @@ Pydantic
 Flask-SQLAlchemy
 Flask-JWT-Extended
 Flask-Pydantic
+Flask-Migrate
 pydantic[email]
 psycopg2
