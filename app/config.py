@@ -3,7 +3,7 @@ from os import environ
 
 class Config:
     SQLALCHEMY_DATABASE_URI = environ.get(
-        "DATABASE_URL", "postgresql+psycopg2://admin:1234@localhost:5432/root"
+        "DATABASE_URL", "postgresql+psycopg2://admin:1234@database:5432/root"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "super-secret-key"
