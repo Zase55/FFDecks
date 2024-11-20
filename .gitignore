@@ -5,3 +5,4 @@ venv
 Tareas.txt
 Notas.txt
 instance
+.env
