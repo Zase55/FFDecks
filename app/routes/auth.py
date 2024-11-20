@@ -34,15 +34,15 @@ def home():
 @bp_auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        data = request.get_json()
         try:
-            user_register = UserRegisterSchema(**data)
+            form_data = request.form.to_dict()
+            user_register = UserRegisterSchema(**form_data)
         except ValidationError as e:
-            jsonify(e.errors()), 400
+            flash(e.errors())
             return redirect(url_for("auth.register"))
 
-        user = create_user(user_register)
-        jsonify({"message": "Usuario creado correctamente.", "user_id": user.id}), 201
+        create_user(user_register)
+        flash("Usuario creado correctamente.")
         return redirect(url_for("auth.login"))
     return render_template("register.html", menu=menu_items, title="Registro")
 
