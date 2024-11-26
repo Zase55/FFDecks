@@ -1,0 +1,7 @@
+# Control de versiones
+.git
+.gitignore
+
+# Configuración sensible
+.env.default
+.env.default.local
