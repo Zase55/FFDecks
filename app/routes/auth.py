@@ -35,15 +35,34 @@ def home():
 def register():
     if request.method == "POST":
         try:
-            form_data = request.form.to_dict()
+            # Determinar si los datos vienen en formato JSON o desde un formulario
+            if request.content_type == "application/json":
+                # Procesar datos como JSON
+                form_data = request.get_json()
+            else:
+                # Procesar datos desde un formulario
+                form_data = request.form.to_dict()
+
+            # Validar los datos
             user_register = UserRegisterSchema(**form_data)
         except ValidationError as e:
-            flash(e.errors())
-            return redirect(url_for("auth.register"))
+            # Manejo de errores en función del tipo de solicitud
+            if request.content_type == "application/json":
+                return jsonify({"errors": e.errors()}), 400
+            else:
+                flash(e.errors())
+                return redirect(url_for("auth.register"))
 
+        # Crear el usuario
         create_user(user_register)
-        flash("Usuario creado correctamente.")
-        return redirect(url_for("auth.login"))
+        # Responder en función del tipo de solicitud
+        if request.content_type == "application/json":
+            return jsonify({"message": "Usuario creado correctamente."}), 201
+        else:
+            flash("Usuario creado correctamente.")
+            return redirect(url_for("auth.login"))
+
+    # Manejo para solicitudes GET
     return render_template("register.html", menu=menu_items, title="Registro")
 
 
@@ -51,19 +70,43 @@ def register():
 def login():
     if request.method == "POST":
         try:
-            form_data = request.form.to_dict()
+            # Determinar si los datos vienen en formato JSON o desde un formulario
+            if request.content_type == "application/json":
+                # Procesar datos como JSON
+                form_data = request.get_json()
+            else:
+                # Procesar datos desde un formulario
+                form_data = request.form.to_dict()
+
+            # Validar los datos
             user_login = UserLoginSchema(**form_data)
         except ValidationError as e:
-            flash(e.errors())
-            return redirect(url_for("auth.login"))
+            # Manejo de errores en función del tipo de solicitud
+            if request.content_type == "application/json":
+                return jsonify({"errors": e.errors()}), 400
+            else:
+                flash(e.errors())
+                return redirect(url_for("auth.login"))
+        # Devolver el token.
         access_token = check_password(user_login)
-        if access_token:
-            flash("Usuario logueado correctamente.")
-            response = make_response(redirect(url_for("auth.home")))
-            set_access_cookies(response, access_token)
-            return response
-        flash("Error, la contraseña es errónea.")
-        return redirect(url_for("auth.login"))
+        # Responder en función del tipo de solicitud
+        if request.content_type == "application/json":
+            if access_token:
+                return jsonify(
+                    {
+                        "message": "Usuario logueado correctamente.",
+                        "access_token": access_token,
+                    }
+                ), 201
+            return jsonify({"message": "Error, la contraseña es errónea."}), 400
+        else:
+            if access_token:
+                flash("Usuario logueado correctamente.")
+                response = make_response(redirect(url_for("auth.home")))
+                set_access_cookies(response, access_token)
+                return response
+            flash("Error, la contraseña es errónea.")
+            return redirect(url_for("auth.login"))
     return render_template("login.html", menu=menu_items, title="Login")
 
 
