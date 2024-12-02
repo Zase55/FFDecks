@@ -17,6 +17,7 @@ from flask_jwt_extended import (
 from pydantic import ValidationError
 
 from app.routes.constants import menu_items, menu_items_login
+from app.routes.utils import get_data_by_request_type
 from app.schemas import UserLoginSchema, UserRegisterSchema
 from app.services import check_password, create_user
 
@@ -35,13 +36,7 @@ def home():
 def register():
     if request.method == "POST":
         try:
-            # Determinar si los datos vienen en formato JSON o desde un formulario
-            if request.content_type == "application/json":
-                # Procesar datos como JSON
-                form_data = request.get_json()
-            else:
-                # Procesar datos desde un formulario
-                form_data = request.form.to_dict()
+            form_data = get_data_by_request_type(request)
 
             # Validar los datos
             user_register = UserRegisterSchema(**form_data)
@@ -70,13 +65,7 @@ def register():
 def login():
     if request.method == "POST":
         try:
-            # Determinar si los datos vienen en formato JSON o desde un formulario
-            if request.content_type == "application/json":
-                # Procesar datos como JSON
-                form_data = request.get_json()
-            else:
-                # Procesar datos desde un formulario
-                form_data = request.form.to_dict()
+            form_data = get_data_by_request_type(request)
 
             # Validar los datos
             user_login = UserLoginSchema(**form_data)
