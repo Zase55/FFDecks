@@ -1,7 +1,18 @@
+docker-compose.yml
+
 # Control de versiones
 .git
 .gitignore
 
 # Configuración sensible
-.env.default
+.env
+.env.default.docker
 .env.default.local
+
+# Ignorar pre-commit y hooks
+.pre-commit-config.yaml
+git-hook-commit-msg
+
+__pycache__
+migrations
+venv
