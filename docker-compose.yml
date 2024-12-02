@@ -22,9 +22,9 @@ services:
     depends_on:
       - database
     env_file:
-      - .env
+      - .env.docker
     volumes:
-      - ".:/app"
+      - "./app:/code/app"
 
 volumes:
   root-database:
