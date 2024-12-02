@@ -5,15 +5,15 @@ FROM python:3.11-alpine3.19
 RUN apk add build-base libpq libpq-dev
 
 # Copia los archivos de la app
-COPY . /app
+COPY . /code
 
 # Establece el directorio de trabajo
-WORKDIR /app
+WORKDIR /code
 
 # Instala las dependencias
 RUN pip install -r requirements.txt
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/code
 
 # Comando para ejecutar la aplicación
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]
