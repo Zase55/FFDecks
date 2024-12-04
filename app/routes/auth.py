@@ -16,20 +16,12 @@ from flask_jwt_extended import (
 )
 from pydantic import ValidationError
 
-from app.routes.constants import menu_items, menu_items_login
+from app.routes.constants import menu_items
 from app.routes.utils import get_data_by_request_type
 from app.schemas import UserLoginSchema, UserRegisterSchema
 from app.services import check_password, create_user
 
 bp_auth = Blueprint("auth", __name__)
-
-
-@bp_auth.route("/")
-@jwt_required(optional=True)
-def home():
-    current_user = get_jwt_identity()
-    menu = menu_items_login if current_user else menu_items
-    return render_template("menu.html", menu=menu, title="Inicio")
 
 
 @bp_auth.route("/register", methods=["GET", "POST"])
@@ -91,7 +83,7 @@ def login():
         else:
             if access_token:
                 flash("Usuario logueado correctamente.")
-                response = make_response(redirect(url_for("auth.home")))
+                response = make_response(redirect(url_for("home.home")))
                 set_access_cookies(response, access_token)
                 return response
             flash("Error, la contraseña es errónea.")
@@ -112,6 +104,6 @@ def protected():
 @bp_auth.route("/logout", methods=["GET"])
 @jwt_required()
 def logout():
-    response = make_response(redirect(url_for("auth.home")))
+    response = make_response(redirect(url_for("home.home")))
     unset_access_cookies(response)
     return response
