@@ -8,3 +8,6 @@ Flask-Migrate
 pydantic[email]
 psycopg2
 python-dotenv
+redis
+yagmail
+Celery
