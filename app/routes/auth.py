@@ -16,6 +16,7 @@ from flask_jwt_extended import (
 )
 from pydantic import ValidationError
 
+from app.celery_worker import send_without_attachment
 from app.routes.constants import menu_items
 from app.routes.utils import get_data_by_request_type
 from app.schemas import UserLoginSchema, UserRegisterSchema
@@ -42,6 +43,7 @@ def register():
 
         # Crear el usuario
         create_user(user_register)
+        send_without_attachment.apply_async(args=("sergiocobo90@hotmail.es",))
         # Responder en función del tipo de solicitud
         if request.content_type == "application/json":
             return jsonify({"message": "Usuario creado correctamente."}), 201
