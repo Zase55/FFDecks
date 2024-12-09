@@ -13,5 +13,7 @@ celery_app = Celery("send email", broker=redis_broker, backend=redis_broker)
 
 
 @celery_app.task
-def send_without_attachment(recipient_email):
-    yag.send(to=recipient_email, subject="Testing Yagmail", contents="Hurray, it worked!")
+def send_without_attachment(
+    recipient_email, subject="Prueba", message="Mensaje de Prueba."
+):
+    yag.send(to=recipient_email, subject=subject, contents=message)
