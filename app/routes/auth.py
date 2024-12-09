@@ -43,7 +43,7 @@ def register():
 
         # Crear el usuario
         create_user(user_register)
-        send_without_attachment.apply_async(args=("sergiocobo90@hotmail.es",))
+        send_without_attachment.apply_async(args=("sergiocobo90@hotmail.es", "Prueba"))
         # Responder en función del tipo de solicitud
         if request.content_type == "application/json":
             return jsonify({"message": "Usuario creado correctamente."}), 201
