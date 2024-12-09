@@ -3,8 +3,10 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 
 from app.config import Config
-from app.models import db
+from app.models.db_instance import DBSingleton
 from app.routes import blueprints
+
+db = DBSingleton.get_instance()
 
 
 def create_app():
