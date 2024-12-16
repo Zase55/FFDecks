@@ -1,3 +1,8 @@
+import uuid
+from os import environ
+
+import redis
+from celery.result import AsyncResult
 from flask import (  # type: ignore
     Blueprint,
     flash,
@@ -24,6 +29,10 @@ from app.services import check_password, create_user
 
 bp_auth = Blueprint("auth", __name__)
 
+redis_client = redis.StrictRedis(
+    host=environ.get("REDIS_HOST", "localhost"), port=6379, decode_responses=True
+)
+
 
 @bp_auth.route("/register", methods=["GET", "POST"])
 def register():
@@ -41,14 +50,41 @@ def register():
                 flash(e.errors())
                 return redirect(url_for("auth.register"))
 
+        # Generar un token único
+        token = str(uuid.uuid4())
+
+        # Almacenar el token en Redis con una expiración (por ejemplo, 1 hora)
+        redis_client.setex(token, 3600, user_register.email)
+
+        # Crear la URL de confirmación
+        confirm_url = url_for("auth.confirm_email", token=token, _external=True)
+
+        # Enviar el correo de confirmación de manera asíncrona
+        subject = "Confirma tu registro"
+        message = f"""
+        Hola {user_register.username},
+
+        Gracias por registrarte. Por favor, confirma tu cuenta haciendo clic en el siguiente enlace:
+        {confirm_url}
+
+        Este enlace será válido por 1 hora.
+        """
+
         # Crear el usuario
         create_user(user_register)
-        send_without_attachment.apply_async(args=("sergiocobo90@hotmail.es", "Prueba"))
+        task = send_without_attachment.apply_async(
+            args=("sergiocobo90@hotmail.es", subject, message)
+        )
         # Responder en función del tipo de solicitud
         if request.content_type == "application/json":
-            return jsonify({"message": "Usuario creado correctamente."}), 201
+            return jsonify(
+                {
+                    "message": "Registro exitoso. Correo de confirmación enviado.",
+                    "task_id": task.id,
+                }
+            ), 201
         else:
-            flash("Usuario creado correctamente.")
+            flash("Registro exitoso. Correo de confirmación enviado.")
             return redirect(url_for("auth.login"))
 
     # Manejo para solicitudes GET
@@ -109,3 +145,26 @@ def logout():
     response = make_response(redirect(url_for("home.home")))
     unset_access_cookies(response)
     return response
+
+
+@bp_auth.route("/confirm/<token>", methods=["GET"])
+def confirm_email(token):
+    email = redis_client.get(token)
+
+    if not email:
+        return jsonify({"error": "Token inválido o expirado"}), 400
+
+    # Aquí puedes registrar al usuario en tu base de datos
+    # Por ejemplo, guardar el email en una tabla de usuarios confirmados
+
+    # Eliminar el token de Redis
+    redis_client.delete(token)
+
+    return jsonify({"message": f"Correo {email} confirmado con éxito"}), 200
+
+
+@bp_auth.route("/task_status/<task_id>", methods=["GET"])
+def get_task_status(task_id):
+    """Consulta el estado de una tarea de Celery"""
+    task_result = AsyncResult(task_id, app=send_without_attachment)
+    return jsonify({"task_id": task_id, "status": task_result.status}), 200
