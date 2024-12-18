@@ -14,8 +14,6 @@ def create_app():
     app.config.from_object(Config)
     db.init_app(app)
     Migrate(app, db)
-
-    # Setup the Flask-JWT-Extended extension
     JWTManager(app)
 
     with app.app_context():

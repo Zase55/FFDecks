@@ -5,7 +5,6 @@ from app.models.users import User, db
 from app.schemas import UserLoginSchema, UserRegisterSchema
 
 
-# función para crear los datos de registro.
 def create_user(user_data: UserRegisterSchema) -> User:
     hashed_password = generate_password_hash(user_data.password)
     user = User(username=user_data.username, email=user_data.email, password=hashed_password)
@@ -28,7 +27,6 @@ def check_confirm_email(user: User) -> bool:
     return user.confirmed_email
 
 
-# Función para comprobar el password.
 def check_password(user_login: UserLoginSchema, user: User) -> bool:
     return check_password_hash(user.password, user_login.password)
 
