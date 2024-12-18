@@ -25,7 +25,7 @@ from app.celery_worker import send_without_attachment
 from app.routes.constants import menu_items
 from app.routes.utils import get_data_by_request_type
 from app.schemas import UserLoginSchema, UserRegisterSchema
-from app.services import check_password, create_user
+from app.services import create_user, grant_access_token, update_confirmed_email
 
 bp_auth = Blueprint("auth", __name__)
 
@@ -65,7 +65,7 @@ def register():
         Hola {user_register.username},
 
         Gracias por registrarte. Por favor, confirma tu cuenta haciendo clic en el siguiente enlace:
-        {confirm_url}
+        <a href='{confirm_url}'><button>Confirmar Correo</button></a>
 
         Este enlace será válido por 1 hora.
         """
@@ -107,7 +107,7 @@ def login():
                 flash(e.errors())
                 return redirect(url_for("auth.login"))
         # Devolver el token.
-        access_token = check_password(user_login)
+        access_token = grant_access_token(user_login)
         # Responder en función del tipo de solicitud
         if request.content_type == "application/json":
             if access_token:
@@ -156,6 +156,11 @@ def confirm_email(token):
 
     # Aquí puedes registrar al usuario en tu base de datos
     # Por ejemplo, guardar el email en una tabla de usuarios confirmados
+
+    funcion = update_confirmed_email(email)
+    print(f"{funcion} {email}")
+    if update_confirmed_email(email) == 0:
+        return jsonify({"error": "Se produjo un error al confirmar el registro."}), 400
 
     # Eliminar el token de Redis
     redis_client.delete(token)
