@@ -14,5 +14,4 @@ docker-compose.yml
 git-hook-commit-msg
 
 __pycache__
-migrations
 venv
