@@ -1,0 +1,132 @@
+{% extends "menu.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ card.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: left;
+        }
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .card-content {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .card-image {
+            flex: 1 1 40%;
+            padding-right: 20px;
+            text-align: center;
+        }
+
+        .card-image img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .card-details {
+            flex: 1 1 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .card-details p {
+            margin: 5px 0;
+        }
+
+        .abilities-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .ability-item {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .ability-image {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+        }
+        h2 {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<a href="{{ url_for('cards.show_cards') }}">⬅ Volver</a>
+
+<body>
+    <div class="card-container">
+        <div class="card-header">
+            <h2>{{ card.name }}</h2>
+            <h3>{{ card.number }}</h3>
+        </div>
+        <div class="card-content">
+            <div class="card-image">
+                <img src="{{ card.image }}" alt="{{ card.name }}">
+            </div>
+            <div class="card-details">
+                <p><strong>Rareza:</strong> {{ card.rarity }}</p>
+                <p><strong>Set</strong> {{ card.card_set }}</p>
+                <p><strong>Elementos:</strong> {{ card.elements_list | map(attribute="value") | join(", ") }}</p>
+                <p><strong>Coste:</strong> {{ card.cost }}</p>
+                <p><strong>Tipo:</strong> {{ card.card_type }}</p>
+                <p><strong>EX Burst:</strong> {{ card.exburst }}</p>
+                <p><strong>Multicopia:</strong> {{ card.multiplayable }}</p>
+                <p><strong>Oficio:</strong> {{ card.job_list | map(attribute="value") | join(", ") }}</p>
+                <p><strong>Categoría:</strong> {{ card.categories_list | map(attribute="value") | join(", ") }}</p>
+                <p><strong>Poder:</strong> {{ card.power }}</p>
+                <p><strong>Habilidad:</strong>
+                    <div class="abilities-container">
+                        {% for ability in card.abilities_list %}
+                            <div class="ability-item">
+                                {% if ability.value.startswith('http') %}
+                                    <img src="{{ ability.value }}" alt="{{ ability.value }}" class="ability-image">
+                                {% else %}
+                                    <span>{{ ability.value }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </p>
+        </div>
+    </div>
+</body>
+{% endblock %}

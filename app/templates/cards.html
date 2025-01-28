@@ -1,0 +1,43 @@
+{% extends "menu.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: left;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(3, auto);
+            gap: 10px;
+            padding: 40px;
+            justify-content: center;
+        }
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-container">
+        {% for card in cards %}
+        <div class="card">
+            <a href="{{ url_for('cards.card_detail', card_id=card.id) }}">
+                <img src="{{ card.image }}" alt="Carta">
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+{% endblock %}
