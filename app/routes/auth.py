@@ -23,7 +23,7 @@ from app.celery_worker import send_without_attachment
 from app.routes.constants import menu_items
 from app.routes.utils import get_data_by_request_type
 from app.schemas import UserLoginSchema, UserRegisterSchema
-from app.services import create_user, grant_access_token, update_confirmed_email
+from app.services.auth import create_user, grant_access_token, update_confirmed_email
 from app.util_functions.routes_auth_utils import (
     control_request_content_type_error,
     control_request_content_type_login,
