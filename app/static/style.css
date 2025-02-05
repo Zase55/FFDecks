@@ -55,3 +55,8 @@ nav ul li ul ul {
     left: 100%;
     top: 0;
 }
+
+h1 {line-height: 50px;
+    color: #4b4b4b8e;
+    border-bottom: 2px solid;
+}
