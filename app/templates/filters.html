@@ -1,0 +1,153 @@
+
+<div class="container">
+
+    <!--<script>
+        function filterByElement(element) {
+            //console.log(element, "prueba")
+            const url = new URL(window.location.href);
+            url.searchParams.set('element', element);
+            window.location.href = url.toString();
+        }
+    </script>-->
+
+    <script>
+        function toggleElementFilter(event, element) {
+            event.preventDefault();  // Evita la navegación automática
+
+            const url = new URL(window.location.href);
+            let selectedElements = url.searchParams.getAll("element");
+
+            if (selectedElements.includes(element)) {
+                // Si ya está seleccionado, lo eliminamos
+                selectedElements = selectedElements.filter(el => el !== element);
+            } else {
+                // Si no está seleccionado, lo agregamos
+                selectedElements.push(element);
+            }
+
+            // Limpiar y volver a agregar los parámetros a la URL
+            url.searchParams.delete("element");
+            selectedElements.forEach(el => url.searchParams.append("element", el));
+
+            window.location.href = url.toString();
+        }
+    </script>
+
+    <script>
+        function filterByType(card_type) {
+            event.preventDefault();
+
+            const url = new URL(window.location.href);
+            let selectedCardTypes = url.searchParams.getAll("card_type");
+
+            if (selectedCardTypes.includes(card_type)) {
+                // Si ya está seleccionado, lo eliminamos
+                selectedCardTypes = selectedCardTypes.filter(ct => ct !== card_type);
+            } else {
+                // Si no está seleccionado, lo agregamos
+                selectedCardTypes.push(card_type);
+            }
+
+            // Limpiar y volver a agregar los parámetros a la URL
+            url.searchParams.delete("card_type");
+            selectedCardTypes.forEach(ct => url.searchParams.append("card_type", ct));
+
+            // url.searchParams.set('card_type', card_type);
+            window.location.href = url.toString();
+        }
+    </script>
+
+    <script>
+        function filterByCost(cost) {
+            event.preventDefault();
+
+            const url = new URL(window.location.href);
+            let selectedCosts = url.searchParams.getAll("cost");
+
+            if (selectedCosts.includes(cost)) {
+                // Si ya está seleccionado, lo eliminamos
+                selectedCosts = selectedCosts.filter(cs => cs !== cost);
+            } else {
+                // Si no está seleccionado, lo agregamos
+                selectedCosts.push(cost);
+            }
+
+            // Limpiar y volver a agregar los parámetros a la URL
+            url.searchParams.delete("cost");
+            selectedCosts.forEach(cs => url.searchParams.append("cost", cs));
+
+            // url.searchParams.set('cost', cost);
+            window.location.href = url.toString();
+        }
+    </script>
+
+    <form method="GET" action="{{ url_for('cards.show_cards') }}" class="filters">
+        <input type="text" name="name" placeholder="Card Name">
+    </form>
+    <div class="filters-container">
+        <div class="filter-group">
+            <fieldset>
+                <legend>Element</legend>
+                {% for element in ["Fire", "Ice", "Wind", "Earth", "Lightning", "Water", "Light", "Dark"] %}
+                    <!--<button class="filter-button" onclick="filterByElement('{{ element }}')">-->
+                    {% set selected = "selected" if element in request.args.getlist('element') else "" %}
+                    <button class="filter-button {{ selected }}" onclick="toggleElementFilter(event, '{{ element }}')">
+                        <img src="https://ffdecks.com/assets/fftcg/markup/{{ element }}.png" alt="{{ element }}">
+                    </button>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <div class="filter-group">
+            <fieldset>
+                <legend>Type</legend>
+                {% for card_type in ["Forward", "Backup", "Summon", "Monster"] %}
+                    {% set selected = "selected" if card_type in request.args.getlist('card_type') else "" %}
+                    <button class="filter-button {{ selected }}" onclick="filterByType('{{ card_type }}')" value="{{ card_type }}">{{ card_type }}</button>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <div class="filter-group">
+            <fieldset>
+                <legend>Cost</legend>
+                {% for cost in [1, 2, 3, 4, 5, 6 , 7, 8, 9, 10, 11] %}
+                    {% set selected = "selected" if cost in request.args.getlist('cost') else "" %}
+                    <button class="filter-button {{ selected }}" onclick="filterByCost('{{ cost }}')" value="{{ cost }}">{{ cost }}</button>
+                {% endfor %}
+            </fieldset>
+        </div>
+    </div>
+    <form>
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <option value="">-- Todas --</option>
+            {% for category in categories %}
+                <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+
+        <div>
+            <select name="operator-power">
+                <option value="=">=</option>
+                <option value=">=">>=</option>
+                <option value=">">></option>
+                <option value="<="><=</option>
+                <option value="<"><</option>
+            </select>
+            <input type="number" name="power" placeholder="Power">
+        </div>
+
+        <label for="rarity">Rarity:</label>
+        <select name="rarity">
+            <option value="">-- Todas --</option>
+            {% for rarity in ["Common", "Rare", "Hero", "Legend", "Starter", "Promo"] %}
+                <option value="{{ rarity }}">{{ rarity }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="job" placeholder="Job">
+        <input type="text" name="ability" placeholder="Ability Text">
+
+        <button type="reset">Reset</button>
+        <button type="submit">Buscar</button>
+    </form>
+</div>

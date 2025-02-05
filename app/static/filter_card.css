@@ -1,0 +1,40 @@
+.container {
+    max-width: 1200px;
+    margin: auto;
+    text-align: left;
+    background-color: #f8f8ff8e;
+}
+.filters-container {
+    display: flex;
+    gap: 10px; /* Espacio entre los grupos de filtros */
+    flex-wrap: wrap; /* Si la pantalla es pequeña, se acomoda en varias líneas */
+    justify-content: space-between; /* Distribuir los elementos */
+}
+
+.filter-group {
+    flex: 1; /* Que los filtros se expandan proporcionalmente */
+    min-width: 200px; /* Evita que se encojan demasiado */
+}
+
+.filter-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-button:hover {
+    background-color: #f0f0f0;
+}
+.filter-button img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.selected {
+    border: 2px solid #007bff;
+    background-color: #f0f0f0
+}

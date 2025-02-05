@@ -1,0 +1,42 @@
+<div class="results-per-page">
+    <!--<form method="GET" action="{{ url_for('cards.show_cards') }}?{{ args }}" class="limit-page">-->
+    <form method="GET" class="limit-page">
+        {% for key, value in request.args.items() %}
+            {% if key not in ("limit", "page") %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+        <label for="limit">Results Per Page</label>
+        <select name="limit" id="limit" onchange="this.form.submit()">
+            {% for value in [12, 24, 48, 96] %}
+                <option value="{{ value }}" {% if request.args.get("limit", "24") == value|string %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <!--
+    <form class="pagination-container">
+        <a href="{{ url_for('cards.show_cards') }}?{{ args|replace('page=' ~ request.args.get('page', ''), 'page=1') }}" class="{% if pagination['has_prev']!=1 %}disabled{% endif %}">⏮</a>
+        <a href="{{ url_for('cards.show_cards') }}?{{ args|replace('page=' ~ request.args.get('page', '1'), 'page=' ~ (pagination['page'] - 1)) }}" class="{% if not pagination['has_prev'] %}disabled{% endif %}">◀</a>
+
+        <span>{{ pagination["page"] }} de {{ pagination["pages"] }}</span>
+
+        <a href="{{ url_for('cards.show_cards') }}?{{ args|replace('page=' ~ request.args.get('page', '1'), 'page=' ~ (pagination['page'] + 1)) }}" class="{% if not pagination['has_next'] %}disabled{% endif %}">▶</a>
+        <a href="{{ url_for('cards.show_cards') }}?{{ args|replace('page=' ~ request.args.get('page', '1'), 'page=' ~ (pagination['pages'])) }}" class="{% if pagination['page']==pagination['pages'] %}disabled{% endif %}">⏭</a>
+    </form>
+    -->
+    <form class="pagination-container">
+        {% for key, value in request.args.items() %}
+            {% if key != "page" %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+        {% endfor %}
+
+        <button type="submit" name="page" value="1" {% if not pagination['has_prev'] %}disabled{% endif %}>⏮</button>
+        <button type="submit" name="page" value="{{ pagination['page'] - 1 }}" {% if not pagination['has_prev'] %}disabled{% endif %}>◀</button>
+
+        <span>{{ pagination["page"] }} de {{ pagination["pages"] }}</span>
+
+        <button type="submit" name="page" value="{{ pagination['page'] + 1 }}" {% if not pagination['has_next'] %}disabled{% endif %}>▶</button>
+        <button type="submit" name="page" value="{{ pagination['pages'] }}" {% if pagination['page'] == pagination['pages'] %}disabled{% endif %}>⏭</button>
+    </form>
+</div>
