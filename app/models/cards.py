@@ -8,10 +8,10 @@ class Card(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    number = db.Column(db.String(80), nullable=False)
+    number = db.Column(db.String(80), nullable=False, unique=True)
     collection = db.Column(db.String(5), nullable=False)
     serial = db.Column(db.String(5), nullable=False)
-    image = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String(200), nullable=False)
     rarity = db.Column(db.String(80), nullable=False)
     card_set = db.Column(db.String(80), nullable=False)
     cost = db.Column(db.Integer, nullable=False)
@@ -67,7 +67,7 @@ class Ability(db.Model):
     card_id = db.Column(db.Integer, db.ForeignKey(Card.id), nullable=False)
     row = db.Column(db.Integer, nullable=False)
     column = db.Column(db.Integer, nullable=False)
-    value_type = db.Column(db.String(80), nullable=False)
+    value_type = db.Column(db.String(200), nullable=False)
     value = db.Column(db.Text, nullable=False)
 
     card = db.relationship("Card", cascade="all,delete", backref="abilities")
