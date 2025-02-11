@@ -8,3 +8,5 @@ instance
 .env
 .env.docker
 migrations
+prueba.jpg
+*.log
